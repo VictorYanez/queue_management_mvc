@@ -1,0 +1,33 @@
+﻿@using queue_management.Models
+@model queue_management.Models.Role
+
+@{
+    ViewData["Title"] = "Detalles del Rol";
+}
+
+<h1>Detalle del Rol </h1>
+<h3>Id.: @Model.RoleId - @Model.RoleName </h3>
+<hr />
+<form asp-controller="Roles" asp-action="Index" method="get">
+
+    <!-- Definir el id que se envía desde la vista al controlador -->
+    <input type="hidden" asp-for="RoleId" value="@Model.RoleId" class="Rol" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <!--- Para Nombre del Rol   -->
+    <div class="mb-3 form-group">
+        <label asp-for="RoleName" class="form-label">@Html.DisplayNameFor(model => model.RoleName)</label>
+        <input type="text" asp-for="RoleName" class="form-control" readonly />
+        <span asp-validation-for="RoleName" class="text-danger"></span>
+    </div>
+
+    <div>
+        <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.RoleId">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+        <a class="btn btn-secondary" asp-action="Index">
+            <i class="bi bi-x-square"></i> Cancelar</i>
+        </a>
+    </div>
+
+</form>

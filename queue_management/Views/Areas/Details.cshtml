@@ -1,0 +1,50 @@
+﻿@using queue_management.Models
+@model queue_management.Models.Area
+
+@{
+    ViewData["Title"] = "Detalles del País"; 
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+</head>
+
+<body>
+    <h1>Detalle del Área </h1>
+    <h3>Id.: @Model.AreaId - @Model.AreaName </h3>
+    <hr />
+    <form asp-controller="Areas" asp-action="Details" method="get">
+
+        <!-- Definir el id que se envía desde la vista al controlador -->
+        <input type="hidden" asp-for="AreaId" value="@Model.AreaId" class="Area" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <!---------------  Información propia de Áreas  ------------->
+        <div class="form-group mb-3">
+            <label asp-for="AreaName" class="control-label" type="text"></label>
+            <input asp-for="AreaName" class="form-control" readonly type="text" />
+            <span asp-validation-for="AreaName" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-3">
+            <label asp-for="AreaDescription" class="control-label" type="text"></label>
+            <input asp-for="AreaDescription" class="form-control" readonly type="text" />
+            <span asp-validation-for="AreaDescription" class="text-danger"></span>
+        </div>
+
+        <!---------------  Botones Summit y Editar  ------------->
+        <div>
+            <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.AreaId">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            <a class="btn btn-secondary" asp-action="Index">
+                <i class="bi bi-x-square"></i> Cancelar
+            </a>
+        </div>
+
+    </form>
+
+</body>
+</html>

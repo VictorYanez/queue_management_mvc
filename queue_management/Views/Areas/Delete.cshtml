@@ -1,0 +1,48 @@
+﻿@using queue_management.Models
+@model queue_management.Models.Area
+
+@{
+    ViewData["Title"] = "Borrar Área";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Borrar</title>
+</head>
+<body>
+    <h1>Borrar Área</h1>
+    <h3>Id.: @Model.AreaId - @Model.AreaName </h3>
+    <h3>¿Estás seguro de que deseas borrar esta Área?</h3>
+    <hr />
+
+    <form asp-controller="Areas" asp-action="Delete" method="post">
+
+        <!---------------  Información propia de Áreas  ------------->
+        <div class="form-group mb-3">
+            <label asp-for="AreaName" class="control-label" type="text"></label>
+            <input asp-for="AreaName" class="form-control" readonly type="text" />
+            <span asp-validation-for="AreaName" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-3">
+            <label asp-for="AreaDescription" class="control-label" type="text"></label>
+            <input asp-for="AreaDescription" class="form-control" readonly type="text" />
+            <span asp-validation-for="AreaDescription" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <!---------------  Botones summit y cancelar  ------------->
+            <hr />
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-floppy"></i> Borrar
+            </button>
+            <a class="btn btn-secondary" asp-action="Index">
+                <i class="bi bi-x-square"></i> Cancelar
+            </a>
+        </div>
+
+    </form>
+</body>
+</html>

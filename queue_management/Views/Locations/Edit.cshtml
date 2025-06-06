@@ -1,0 +1,152 @@
+﻿@using queue_management.Models
+@model queue_management.Models.Location
+
+@{
+    ViewData["Title"] = "Editar Local";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Edit</title>
+</head>
+<body>
+    <h1>Edición de Local</h1>
+    <h3>Id.: @Model.LocationId - @(Model.Country?.CountryName ?? "N/A") - @(Model.Department?.DepartmentName ?? "N/A") - @(Model.Municipality?.MunicipalityName ?? "N/A") - @(Model.District?.DistrictName ?? "N/A") - @Model.City.CityName - @Model.LocationName</h3>
+    <h3>¿Deseas editar este Local?</h3>
+    <hr />
+
+    <div class="col-md-4">
+        <form asp-action="Edit" asp-controller="Locations" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="LocationId" class="Location" />
+            <input type="hidden" asp-for="RowVersion" />
+
+            <!--- Para Lista de Pais   -->
+            <div class="mb-3 form-group">
+                <label asp-for="CountryId" class="form-label">@Html.DisplayNameFor(model => model.Country)</label>
+                <select id="CountryId" name="CountryId" asp-for="CountryId" class="form-select form-select sm" asp-items="ViewBag.CountryId"></select>
+                <span asp-validation-for="CountryId" class="text-danger"></span>
+            </div>
+
+            <!--- Para Lista de Departamento   -->
+            <div class="mb-3 form-group">
+                <label asp-for="DepartmentId" class="form-label">@Html.DisplayNameFor(model => model.Department)</label>
+                <select id="DepartmentId" name="DepartmentId" asp-for="DepartmentId" class="form-select form-select sm" asp-items="ViewBag.DepartmentId"></select>
+                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+            </div>
+
+            <!--- Para Lista de Municipio   -->
+            <div class="mb-3 form-group">
+                <label asp-for="MunicipalityId" class="form-label">@Html.DisplayNameFor(model => model.Municipality)</label>
+                <select id="MunicipalityId" name="MunicipalityId" asp-for="MunicipalityId" class="form-select form-select sm" asp-items="ViewBag.MunicipalityId"></select>
+                <span asp-validation-for="MunicipalityId" class="text-danger"></span>
+            </div>
+
+            <!--- Para Lista de District   -->
+            <div class="mb-3 form-group">
+                <label asp-for="DistrictId" class="form-label">@Html.DisplayNameFor(model => model.District)</label>
+                <select id="RegionId" name="DistrictId" asp-for="DistrictId" class="form-select form-select sm" asp-items="ViewBag.RegionId"></select>
+                <span asp-validation-for="DistrictId" class="text-danger"></span>
+            </div>
+
+            <!---  Para Lista de Ciudades  -->
+            <div class="mb-3 form-group">
+                <label asp-for="CityId" class="form-label">@Html.DisplayNameFor(model => model.City)</label>
+                <select id="CityId" name="CityId" asp-for="CityId" class="form-select form-select sm" asp-items="ViewBag.CityId"></select>
+                <span asp-validation-for="CityId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="LocationName" class="control-label"></label>
+                <input asp-for="LocationName" class="form-control" />
+                <span asp-validation-for="LocationName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PhoneNumber" class="control-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <!---------------  Botones summit y cancelar  ------------->
+            <div class="form-group">
+                <hr />
+                <button type="submit" class="btn btn-primary"><i class="bi bi-floppy"></i> Aplicar</button>
+                <a class="btn btn-secondary" asp-action="Index"><i class="bi bi-x-square"></i> Cancelar</a>
+            </div>
+
+        </form>
+    </div>
+
+</body>
+</html>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <!----------   Cargar jQuery primero   --------------->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <!----------   Para llenados de los listados de las Entidades padres del Local   --------------->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Al seleccionar un país, se cargan los departamentos correspondientes
+            $('#CountryId').change(function () {
+                var countryId = $(this).val();
+                $.getJSON('/Locations/GetDepartments', { countryId: countryId }, function (data) {
+                    var items = '<option value="">Seleccione un Departamento</option>';
+                    $.each(data, function (i, department) {
+                        items += "<option value='" + department.id + "'>" + department.name + "</option>";
+                    });
+                    $('#DepartmentId').html(items);
+                    $('#RegionId').html('<option value="">Seleccione una Región</option>');
+                    $('#MunicipalityId').html('<option value="">Seleccione un Municipio</option>');
+                    $('#CityId').html('<option value="">Seleccione una Ciudad</option>');
+                });
+            });
+
+            // Al seleccionar un departamento, se cargan las regiones correspondientes
+            $('#DepartmentId').change(function () {
+                var departmentId = $(this).val();
+                $.getJSON('/Locations/GetRegions', { departmentId: departmentId }, function (data) {
+                    var items = '<option value="">Seleccione una Región</option>';
+                    $.each(data, function (i, region) {
+                        items += "<option value='" + region.id + "'>" + region.name + "</option>";
+                    });
+                    $('#RegionId').html(items);
+                    $('#MunicipalityId').html('<option value="">Seleccione un Municipio</option>');
+                    $('#CityId').html('<option value="">Seleccione una Ciudad</option>');
+                });
+            });
+
+            // Al seleccionar una región, se cargan los municipios correspondientes
+            $('#RegionId').change(function () {
+                var regionId = $(this).val();
+                $.getJSON('/Locations/GetMunicipalities', { regionId: regionId }, function (data) {
+                    var items = '<option value="">Seleccione un Municipio</option>';
+                    $.each(data, function (i, municipality) {
+                        items += "<option value='" + municipality.id + "'>" + municipality.name + "</option>";
+                    });
+                    $('#MunicipalityId').html(items);
+                    $('#CityId').html('<option value="">Seleccione una Ciudad</option>');
+                });
+            });
+
+            // Al seleccionar un municipio, se cargan las ciudades correspondientes
+            $('#MunicipalityId').change(function () {
+                var municipalityId = $(this).val();
+                $.getJSON('/Locations/GetCities', { municipalityId: municipalityId }, function (data) {
+                    var items = '<option value="">Seleccione una Ciudad</option>';
+                    $.each(data, function (i, city) {
+                        items += "<option value='" + city.id + "'>" + city.name + "</option>";
+                    });
+                    $('#CityId').html(items);
+                });
+            });
+        });
+    </script>
+
+}
+

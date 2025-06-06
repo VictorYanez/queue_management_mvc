@@ -1,0 +1,104 @@
+﻿@using queue_management.Models
+@model IEnumerable<queue_management.Models.Location>
+
+@{
+    ViewData["Title"] = "Listado";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Listado</title>
+</head>
+<body>
+    <h1 class="text-center">Listado de Locales</h1>
+    <div class="row">
+        <div class="offset-9 col-3 mb-3">
+            <div class="float-right">
+                <a asp-action="Create" asp-controller="Locations" class="btn btn-success d-block mx-auto btn-lg">
+                    <i class="bi bi-send-plus mr-2"></i>&nbsp;&nbsp;Nuevo Local
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card border">
+                <div class="card-header">
+                    <h3><strong>Listado de @Model.Count() Locales</strong></h3>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    @if (Model.Count() > 0)
+                    {
+                        <table class="table table-bordered" id="tablaLocations" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>@Html.DisplayNameFor(m => m.Country.CountryName)</th>
+                                    <th>@Html.DisplayNameFor(m => m.Department.DepartmentName)</th>
+                                    <th>@Html.DisplayNameFor(m => m.District.DistrictName)</th>
+                                    <th>@Html.DisplayNameFor(m => m.Municipality.MunicipalityName)</th>
+                                    <th>@Html.DisplayNameFor(m => m.City.CityName)</th>
+                                    <th>@Html.DisplayNameFor(m => m.LocationName)</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(m => item.Country.CountryName)</td>
+                                        <td>@Html.DisplayFor(m => item.Department.DepartmentName)</td>
+                                        <td>@Html.DisplayFor(m => item.Municipality.MunicipalityName)</td>
+                                        <td>@Html.DisplayFor(m => item.District.DistrictName)</td>
+                                        <td>@Html.DisplayFor(m => item.City.CityName)</td>
+                                        <td>@Html.DisplayFor(m => item.LocationName)</td>
+                                        <td>
+                                            <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.LocationId">
+                                                <i class="bi bi-pencil"></i> Editar
+                                            </a>
+                                            <a class="btn btn-info" asp-action="Details" asp-route-id="@item.LocationId">
+                                                <i class="bi bi-info-square"></i> Detalle
+                                            </a>
+                                            <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.LocationId">
+                                                <i class="bi bi-trash"></i> Borrar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p>No hay registros</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+@section Scripts {
+    <!-- DataTables Spanish Language -->
+    <script src="https://cdn.datatables.net/plug-ins/2.0.3/i18n/es-ES.json"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#tablaLocations').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/2.0.3/i18n/es-ES.json'
+                },
+                responsive: true,
+                stateSave: true,
+                dom: '<"top"lf>rt<"bottom"ip><"clear">',
+                pageLength: 10
+            });
+        });
+    </script>
+}

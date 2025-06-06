@@ -1,0 +1,73 @@
+﻿@using queue_management.Models
+@model queue_management.Models.Department
+
+@{
+    ViewData["Title"] = "Editar Departamento";
+}
+
+<h1>Edición Departamento</h1>
+<hr />
+<h4>@Model.CountryId -  @Model.DepartmentId - @Model.DepartmentName </h4>
+<h4>Desea editar este Departamento?</h4>
+<hr />
+
+    <div class="col-md-4">
+
+        <form asp-action="Edit" asp-controller="Departments" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="DepartmentId" />
+            <input type="hidden" asp-for="RowVersion" />
+
+            <!--- Para Lista de Pais   -->
+            <div class="mb-3 form-group">
+                <label asp-for="CountryId" class="form-label">@Html.DisplayNameFor(model => model.Country)</label>
+            <select id="CountryId" name="CountryId" asp-for="CountryId" class="form-select form-select sm" asp-items="ViewBag.CountryId"></select>
+                <span asp-validation-for="CountryId" class="text-danger"></span>
+            </div>
+
+            <!---  Para los campos propios de Departamento  -->
+            <div class="form-group mb-3">
+                <label asp-for="DepartmentName" class="control-label" type="text">@Html.DisplayNameFor(model => model.DepartmentName)</label>
+                <input asp-for="DepartmentName" class="form-control" placeholder="Ingresa la descripción del Departamento" type="text" />
+                <span asp-validation-for="DepartmentName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <!---------------  Botones summit y cancelar  ------------->
+                <hr />
+                <button type="submit" class="btn btn-primary"><i class="bi bi-floppy"></i> Aplicar</button>
+                <a class="btn btn-secondary" asp-action="Index"><i class="bi bi-x-square"></i> Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#CountryId').change(function () {
+                var countryId = $(this).val();
+                $.ajax({
+                    url: '@Url.Action("GetDepartments", "Departments")',
+                    type: 'GET',
+                    data: { countryId: countryId },
+                    success: function (data) {
+                        var departmentSelect = $('#DepartmentId');
+                        departmentSelect.empty();
+                        $.each(data, function (index, optionData) {
+                            departmentSelect.append($('<option/>', {
+                                value: optionData.value,
+                                text: optionData.text
+                            }));
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+    }
+
+

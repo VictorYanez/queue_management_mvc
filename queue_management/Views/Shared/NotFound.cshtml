@@ -1,0 +1,61 @@
+﻿<!-- Views/Shared/NotFound.cshtml -->
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Recurso no encontrado";
+    Layout = "_Layout"; // Usa el layout principal de tu aplicación
+}
+
+<div class="container mt-5">
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+            <h1 class="card-title">
+                <i class="fas fa-exclamation-triangle"></i> Error 404 - Recurso no encontrado
+            </h1>
+        </div>
+        <div class="card-body">
+            <div class="text-center mb-4">
+                <img src="/images/404-error.svg" alt="Error 404" style="max-height: 200px;" class="img-fluid">
+            </div>
+
+            <p class="lead">El recurso que estás buscando no existe o no se encuentra disponible.</p>
+
+            @if (!string.IsNullOrEmpty(Model?.RequestId))
+            {
+                <div class="alert alert-info mt-3">
+                    <p class="mb-1"><strong>ID de Solicitud:</strong> @Model.RequestId</p>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Developer"))
+                    {
+                        <p class="mb-1"><strong>Ruta solicitada:</strong> @Context.Request.Path</p>
+                        <p class="mb-0"><strong>Método:</strong> @Context.Request.Method</p>
+                    }
+                </div>
+            }
+
+            <div class="d-flex justify-content-center mt-4">
+                <a href="@Url.Action("Index", "Home")" class="btn btn-primary mr-3">
+                    <i class="fas fa-home"></i> Página de inicio
+                </a>
+                <button onclick="history.back()" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver atrás
+                </button>
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <small>Si crees que esto es un error, por favor contacta al soporte técnico.</small>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card {
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .lead {
+            font-size: 1.1rem;
+        }
+    </style>
+}

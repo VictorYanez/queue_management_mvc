@@ -1,0 +1,122 @@
+﻿@using queue_management.Models
+@model IEnumerable<Rating>
+
+
+<h1 class="text-center">Listado de Evaluaciones del Servicio</h1>
+
+<div class="row">
+    <div class="offset-9 col-3 mb-3">
+        <div class="float-right">
+            <a asp-action="Create" asp-controller="Ratings" class="btn btn-success d-block mx-auto btn-lg">
+                <i class="bi bi-send-plus mr-2"></i>&nbsp;&nbsp;Nueva Evaluación
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card border">
+            <div class="card-header">
+                <h3><strong>Listado de @Model.Count() Evaluaciones</strong></h3>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                @if (Model.Count() > 0)
+                {
+                    <table class="table table-bordered" id="tablaRatings" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.EvaluationDate)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Score)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Observations)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.UserId)
+                                </th>
+                                <th>
+                                    @Html.DisplayNameFor(model => model.Service)
+                                </th>
+      
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.EvaluationDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Score)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Observations)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.UserId)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Service.ServiceName)
+                                    </td>
+                                    <!-- [<a asp-action="Edit" asp-route-id="@item.RatingId">Edit</a> |] -->
+                                    <td>
+                                        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.RatingId">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                        <a class="btn btn-info" asp-action="Details" asp-route-id="@item.RatingId">
+                                            <i class="bi bi-info-square"></i> Detalle
+                                        </a>
+                                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.RatingId">
+                                            <i class="bi bi-trash"></i> Borrar
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>No hay registros</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            //Llamar a datatable
+            $('#tablaRatings').DataTable({
+                language: {
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
+                    "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
+                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ Entradas",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                }
+            });
+        });
+    </script>
+}
+

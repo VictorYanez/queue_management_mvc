@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\queue_management.props" />
+</Project>

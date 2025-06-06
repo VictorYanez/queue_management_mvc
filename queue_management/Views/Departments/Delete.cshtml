@@ -1,0 +1,50 @@
+﻿@using queue_management.Models
+@model queue_management.Models.Department
+
+@{
+    ViewData["Title"] = "Borrar Departamento";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Delete</title>
+</head>
+
+<h1>Borrar Departamento</h1>
+<h3>Id.: @Model.DepartmentId - @Model.Country?.CountryName - @Model.DepartmentName </h3>
+<h3>¿Estás seguro de que deseas borrar este Departamento?</h3>
+<hr />
+
+<form asp-controller="Departments" asp-action="Delete" method="post">
+
+    <!-- Definir el id que se envía desde la vista al controlador -->
+    <input type="hidden" asp-for="DepartmentId" value="DepartmentId" class="Department" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <!--- Para Nombre de País   -->
+    <div class="mb-3 form-group">
+        <label asp-for="Country.CountryName" class="form-label">@Html.DisplayNameFor(model => model.Country)</label>
+        <input type="text" asp-for="Country.CountryName" class="form-control" readonly />
+        <span asp-validation-for="Country.CountryName" class="text-danger"></span>
+    </div>
+
+    <!--- Para Nombre del Departamento   -->
+    <div class="mb-3 form-group">
+        <label asp-for="DepartmentName" class="form-label">@Html.DisplayNameFor(model => model.DepartmentName)</label>
+        <input type="text" asp-for="DepartmentName" class="form-control" readonly />
+        <span asp-validation-for="DepartmentName" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <!---------------  Botones summit y cancelar  ------------->
+        <hr />
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-floppy"></i> Borrar
+        </button>
+        <a class="btn btn-secondary" asp-action="Index">
+            <i class="bi bi-x-square"></i> Cancelar
+        </a>
+    </div>
+</form>
+

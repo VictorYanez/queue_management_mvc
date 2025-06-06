@@ -1,0 +1,92 @@
+﻿@using queue_management.Models
+@model queue_management.Models.Location
+
+@{
+    ViewData["Title"] = "Detalles del Local";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Details</title>
+</head>
+
+<body>
+        <h1>Detalle del Local </h1>
+        <h3>
+            Id.: @Model.LocationId - @Model.Country?.CountryName - @Model.Department?.DepartmentName
+        - @Model?.Municipality?.MunicipalityName - @Model?.District?.DistrictName - @Model?.City.CityName
+            <!--  @Html.DisplayFor(model => model.City.CityName)   -->
+            <!--  @Html.DisplayFor(model => model.Municipality.MunicipalityName)   -->
+        </h3>
+        <hr />
+    <div class="col-md-4">
+        <form asp-controller="Cities" asp-action="Details" method="post">
+            <!-- Definir el id que se envía desde la vista al controlador -->
+            <input type="hidden" asp-for="CityId" value="CityId" class="City" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!--- Para Nombre de País   -->
+            <div class="mb-3 form-group">
+                <label asp-for="Country.CountryName" class="form-label">@Html.DisplayNameFor(model => model.Country)</label>
+                <input type="text" asp-for="Country.CountryName" class="form-control" readonly />
+                <span asp-validation-for="Country.CountryName" class="text-danger"></span>
+            </div>
+
+            <!--- Para Nombre de Departamento   -->
+            <div class="mb-3 form-group">
+                <label asp-for="Department.DepartmentName" class="form-label"> @Html.DisplayNameFor(model => model.Department)</label>
+                <input type="text" asp-for="Department.DepartmentName" class="form-control" readonly />
+                <span asp-validation-for="Department.DepartmentName" class="text-danger"></span>
+            </div>
+
+            <!--- Para Nombre de la Municipio  -->
+            <div class="mb-3 form-group">
+                <label asp-for="Municipality.MunicipalityName" class="form-label">@Html.DisplayNameFor(model => model.Municipality)</label>
+                <input type="text" asp-for="Municipality.MunicipalityName" class="form-control" readonly />
+                <span asp-validation-for="Municipality.MunicipalityName" class="text-danger"></span>
+            </div>
+
+            <!--- Para Nombre de la District   -->
+            <div class="mb-3 form-group">
+                <label asp-for="District.DistrictName" class="form-label">@Html.DisplayNameFor(model => model.District)</label>
+                <input type="text" asp-for="District.DistrictName" class="form-control" readonly />
+                <span asp-validation-for="District.DistrictName" class="text-danger"></span>
+            </div>
+
+            <!--- Para Nombre de la Ciudad  -->
+            <div class="mb-3 form-group">
+                <label asp-for="City.CityName" class="form-label">@Html.DisplayNameFor(model => model.City)</label>
+                <input type="text" asp-for="City.CityName" class="form-control" readonly />
+                <span asp-validation-for="City.CityName" class="text-danger"></span>
+            </div>
+
+            <!---  Para los campos propios de Locales  -->
+            <div class="form-group">
+                <label asp-for="LocationName" class="control-label"></label>
+                <input asp-for="LocationName" class="form-control" readonly />
+                <span asp-validation-for="LocationName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PhoneNumber" class="control-label"></label>
+                <input asp-for="PhoneNumber" class="form-control" readonly />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <!---------------  Botones summit y Editar  ------------->
+                <hr />
+                <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.LocationId">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a class="btn btn-secondary" asp-action="Index">
+                    <i class="bi bi-x-square"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>
