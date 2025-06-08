@@ -65,7 +65,7 @@
                     <div class="form-group">
                         <hr />
                         <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-floppy"></i> Borrar
+                            <i class="bi bi-trash"></i> Borrar
                         </button>
                         <a class="btn btn-secondary" asp-action="Index">
                             <i class="bi bi-x-square"></i> Cancelar
@@ -74,96 +74,7 @@
 
                 </div>
             </form>
-            <!-- Cierre form y Card vOK
-
-            -->
-        </div>
-    </div>
-</div>
-
-<!-- ============================ Scripts en Details ============================ -->
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}@{
-    ViewData["Title"] = "Detalles del País";
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-<!-- ============================ Encabezado Principal ============================ -->
-<div class="text-center">
-    <h1 class="display-6">@ViewData["Title"]</h1>
-</div>
-<hr />
-
-<!-- ============================ Card Responsive Detalle País ============================ -->
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow border-1">
-            <!-- ============================ Encabezado Card ============================ -->
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <i class="bi bi-globe-americas"></i>
-                    Detalle del País Id.: @Model.CountryId - @Model.CountryName
-                </h5>
-            </div>
-            <!-- ============================ Cuerpo Card ============================ -->
-            <form asp-action="Details" method="get" class="needs-validation" novalidate>
-                <div class="card-body">
-                    <!-- ========== País: ID y RowVersion ocultos ========== -->
-                    <!--  <input type="hidden" asp-for="RowVersion" value="@Model.RowVersion" class="RowVersion"/> -->
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-                    <input type="hidden" asp-for="CountryId" />
-                    <input type="hidden" asp-for="RowVersion" />
-
-                    <!-- ========== Nombre del País ========== -->
-                    <div class="form-group mb-3">
-                        <label asp-for="CountryName" class="form-label fw-bold"></label>
-                        <input asp-for="CountryName" class="form-control" readonly />
-                    </div>
-
-                    <!-- ========== Código Personalizado ========== -->
-                    <div class="form-group mb-3">
-                        <label asp-for="CustomCode" class="form-label fw-bold"></label>
-                        <input asp-for="CustomCode" class="form-control" maxlength="14" readonly />
-                    </div>
-
-                    <!-- ========== Estado de Visibilidad ========== -->
-                    <div class="form-group mb-3">
-                        <label asp-for="VisibilityStatus" class="form-label fw-bold"></label>
-                        <select asp-for="VisibilityStatus" asp-items="ViewBag.VisibilityStatusOptions" class="form-select" disabled>
-                            <option value="">-- Seleccione un estado --</option>
-                        </select>
-                    </div>
-
-                    <!-- ========== País por Defecto (Switch) ========== -->
-                    <div class="form-group mb-3">
-                        <label asp-for="IsDefault" class="form-label fw-bold" for="IsDefaultSwitch"></label>
-                        <div class="d-flex align-items-center ps-md-4 border-start ms-1">
-                            <i class="bi bi-star text-primary me-3 fs-5"></i>
-                            <div class="form-check form-switch mb-0 ms-3">
-                                <input asp-for="IsDefault" class="form-check-input" type="checkbox" role="switch" id="IsDefaultSwitch" disabled />
-                            </div>
-                            <small class="text-muted ms-1 fw-bold">¿Definir como país por defecto?</small>
-                        </div>
-                    </div>
-
-                    <!-- ============================ Botones ============================ -->
-                    <div class="form-group">
-                        <hr />
-                        <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model?.CountryId">
-                            <i class="bi bi-pencil"></i> Editar
-                        </a>
-                        <a class="btn btn-secondary" asp-action="Index">
-                            <i class="bi bi-x-square"></i> Cancelar
-                        </a>
-                    </div>
-                </div>
-            </form>
-            <!-- Cierre form y Card vOK
-
-            -->
+            <!-- Cierre form y Card vOK  -->
         </div>
     </div>
 </div>

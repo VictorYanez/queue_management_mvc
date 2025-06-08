@@ -217,3 +217,7 @@ _pkginfo.txt
 # Caché de Visual Studio
 *.[Cc]ache
 !?*.[Cc]ache/
+
+# Ignorar archivos de análisis y hojas de cálculo
+CodigoAnalizar20250604.txt
+ColasDeveloper.xlsx

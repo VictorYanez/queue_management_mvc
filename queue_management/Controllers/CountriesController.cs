@@ -75,6 +75,7 @@ namespace queue_management.Controllers
                 {
                     return NotFound();
                 }
+                ViewBag.VisibilityStatusOptions = GetVisibilityStatusOptions();
                 return View(country);
             }
             catch (Exception ex)
@@ -222,7 +223,7 @@ namespace queue_management.Controllers
         [Route("Countries/Delete/{id:int}")]
         [ActionName("Delete")]
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || id <= 0)
@@ -239,10 +240,7 @@ namespace queue_management.Controllers
                 {
                     return NotFound();
                 }
-
-                var hasDepartments = await _context.Departments.AnyAsync(d => d.CountryId == id);
-                ViewBag.HasDependencies = hasDepartments;
-
+                ViewBag.VisibilityStatusOptions = GetVisibilityStatusOptions();
                 return View(country);
             }
             catch (Exception ex)
