@@ -12,7 +12,7 @@
 <hr />
 <!-- ============================ Definición de Card / Encabezado / Responsive ============================ -->
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <div class="card shadow border-0">
             <!-- ============================ Encabezado Card ============================ -->
             <div class="card-header bg-primary text-white">
@@ -37,12 +37,13 @@
                         <label asp-for="CustomCode" class="form-label fw-bold"></label>
                         <input asp-for="CustomCode" class="form-control" placeholder="Código opcional (máx. 14 caracteres)" maxlength="14" />
                         <span asp-validation-for="CustomCode" class="text-danger"></span>
+                        <small class="text-muted">Este código debe ser único si se especifica</small>
                     </div>
 
                     <!-- Estado de Visibilidad -->
                     <div class="form-group mb-3">
                         <label asp-for="VisibilityStatus" class="form-label fw-bold"></label>
-                        <select asp-for="VisibilityStatus" asp-items="ViewBag.VisibilityStatusOptions" class="form-select" required>
+                        <select asp-for="VisibilityStatus" asp-items=@(ViewData["VisibilityStatusOptions"] as List<SelectListItem>) class="form-select" required>
                             <option value="">-- Seleccione un estado --</option>
                         </select>
                         <span asp-validation-for="VisibilityStatus" class="text-danger"></span>

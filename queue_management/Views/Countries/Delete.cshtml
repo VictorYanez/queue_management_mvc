@@ -44,7 +44,7 @@
                     <!-- ========== Estado de Visibilidad ========== -->
                     <div class="form-group mb-3">
                         <label asp-for="VisibilityStatus" class="form-label fw-bold"></label>
-                        <select asp-for="VisibilityStatus" asp-items="ViewBag.VisibilityStatusOptions" class="form-select" disabled>
+                        <select asp-for="VisibilityStatus" asp-items="@(ViewData["VisibilityStatusOptions"] as List<SelectListItem>)" class="form-select" disabled>
                             <option value="">-- Seleccione un estado --</option>
                         </select>
                     </div>

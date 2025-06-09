@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using queue_management.Data;
 using queue_management.Enums;
 using queue_management.Models;
@@ -15,6 +16,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace queue_management.Controllers
 {
+    [Route("Countries")]
     public class CountriesController : Controller
     {
         private readonly ApplicationDBContext _context;
@@ -33,17 +35,15 @@ namespace queue_management.Controllers
         // ----- 🔥 ----- CRUD Actions ----- 🔥 ----- //
 
         // GET: Countries
-        [Route("Countries")]
-        [ActionName("Index")]
-        [HttpGet]
+        [HttpGet("")]
         public async Task<IActionResult> Index()
         {
             try
             {
                 var countries = await _context.Countries
                     .Where(c => c.VisibilityStatus == VisibilityStatus.Activo)
-                    .AsNoTracking()
                     .OrderBy(c => c.CountryName)
+                    .AsNoTracking()
                     .ToListAsync();
 
                 return View(countries);
@@ -56,8 +56,7 @@ namespace queue_management.Controllers
         }
 
         // GET: Countries/Details
-        [Route("Countries/Details/{id:int}")]
-        [HttpGet]
+        [HttpGet("Countries/Details/{id:int}")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || id <= 0)
@@ -75,7 +74,7 @@ namespace queue_management.Controllers
                 {
                     return NotFound();
                 }
-                ViewBag.VisibilityStatusOptions = GetVisibilityStatusOptions();
+                ViewData["VisibilityStatusOptions"] = GetVisibilityStatusOptions();
                 return View(country);
             }
             catch (Exception ex)
@@ -88,13 +87,11 @@ namespace queue_management.Controllers
 
         #region Create Actions
         // GET: Countries/Create
-        [Route("Countries/Create")]
-        [ActionName("Create")]
-        [HttpGet]
+        [HttpGet("Countries/Create/{id:int}")]
         //[Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            ViewBag.VisibilityStatusOptions = GetVisibilityStatusOptions();
+            ViewData["VisibilityStatusOptions"] = GetVisibilityStatusOptions();
             return View(new Country
             {
                 VisibilityStatus = VisibilityStatus.Activo,
@@ -103,9 +100,7 @@ namespace queue_management.Controllers
         }
 
         // POST: Countries/Create
-        [Route("Countries/Create")]
-        [ActionName("Create")]
-        [HttpPost]
+        [HttpPost("Countries/Create")]
         [ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("CountryId,CountryName,CustomCode,VisibilityStatus,IsDefault")] Country country)
@@ -130,21 +125,21 @@ namespace queue_management.Controllers
                     return RedirectToAction(nameof(Index));
                 }
                 // Si el modelo no es válido, volver a mostrar el formulario
-                ViewBag.VisibilityStatusOptions = GetVisibilityStatusOptions();
+                ViewData["VisibilityStatusOptions"] = GetVisibilityStatusOptions();
                 return View(country);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error al crear país");
+                ModelState.AddModelError("", "Ocurrió un error al crear el país");
                 return RedirectToAction(nameof(Error));
             }
         }
         #endregion
 
         // GET: Countries/Edit
-        [Route("Countries/Edit/{id:int}")]
-        [ActionName("Edit")]
-        [HttpGet]
+        //[Authorize(Roles = "Admin")]
+        [HttpGet("Countries/Edit/{id:int}")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || id <= 0)
@@ -160,7 +155,7 @@ namespace queue_management.Controllers
                     return NotFound();
                 }
 
-                ViewBag.VisibilityStatusOptions = GetVisibilityStatusOptions();
+                ViewData["VisibilityStatusOptions"] = GetVisibilityStatusOptions();
                 return View(country);
             }
             catch (Exception ex)
@@ -172,9 +167,7 @@ namespace queue_management.Controllers
 
         #region Edit Actions
         // POST: Countries/Edit
-        [Route("Countries/Edit/{id:int}")]
-        [ActionName("Edit")]
-        [HttpPost]
+        [HttpPost("Countries/Edit/{id:int}")]
         [ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("CountryId,CountryName,CustomCode,VisibilityStatus,IsDefault,RowVersion")] Country country)
@@ -195,10 +188,11 @@ namespace queue_management.Controllers
 
                     _context.Update(country);
                     await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "País actualizado exitosamente";
                     return RedirectToAction(nameof(Index));
                 }
                 // Si el modelo no es válido, volver a mostrar el formulario
-                ViewBag.VisibilityStatusOptions = GetVisibilityStatusOptions();
+                ViewData["VisibilityStatusOptions"] = GetVisibilityStatusOptions();
                 return View(country);
             }
             catch (DbUpdateConcurrencyException ex)
@@ -220,9 +214,8 @@ namespace queue_management.Controllers
 
         #region Delete Actions
         // GET: Countries/Delete
-        [Route("Countries/Delete/{id:int}")]
         [ActionName("Delete")]
-        [HttpGet]
+        [HttpGet("Countries/Delete/{id:int}")]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -240,7 +233,7 @@ namespace queue_management.Controllers
                 {
                     return NotFound();
                 }
-                ViewBag.VisibilityStatusOptions = GetVisibilityStatusOptions();
+                ViewData["VisibilityStatusOptions"] = GetVisibilityStatusOptions();
                 return View(country);
             }
             catch (Exception ex)
@@ -251,9 +244,8 @@ namespace queue_management.Controllers
         }
 
         // POST: Countries/Delete/5
-        [Route("Countries/Delete/{id:int}")]
+        [HttpPost("Countries/Delete/{id:int}")]
         [ActionName("DeleteConfirmed")]
-        [HttpPost]
         [ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -291,12 +283,6 @@ namespace queue_management.Controllers
             return _context.Countries.Any(e => e.CountryId == id);
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
         private List<SelectListItem> GetVisibilityStatusOptions()
         {
             return Enum.GetValues(typeof(VisibilityStatus))
@@ -320,6 +306,12 @@ namespace queue_management.Controllers
                 .AnyAsync(c => c.CustomCode == customCode && c.CountryId != countryId);
 
             return Json(!exists); // true si NO existe → válido
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
         #endregion
