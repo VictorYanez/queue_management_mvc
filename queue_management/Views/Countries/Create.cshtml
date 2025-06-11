@@ -6,30 +6,36 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!-- ============================ Encabezado Principal ============================ -->
-<div class="text-center">
-    <h1 class="display-6">@ViewData["Title"]</h1>
+<!-- Título -->
+<div class="row justify-content-center mb-4">
+    <div class="col-12 col-md-8 text-center">
+        <h1 class="display-6">@ViewData["Title"]</h1>
+    </div>
 </div>
-<hr />
+<!--  <hr /> = -->
 <!-- ============================ Definición de Card / Encabezado / Responsive ============================ -->
 <div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow border-0">
+    <div class="col-12 col-md-8">
+        <div class="card border-0 shadow-sm">
             <!-- ============================ Encabezado Card ============================ -->
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="bi bi-globe-americas"></i> Crear Nuevo País</h5>
+            <div class="card-header bg-primary text-white border-bottom">
+                <h5 class="mb-0 fs-7"><i class="bi bi-globe-americas"></i>  Crear Nuevo País</h5>
             </div>
             <!-- Formulario de País -->
             <!-- ============================ Cuerpo Card ============================ -->
             <form asp-action="Create" asp-controller="Countries" method="post" class="needs-validation" novalidate>
                 <div class="card-body">
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" id="summaryError"></div>
                     <!-- Llaves ocultas para editar -->
 
                     <!-- Nombre del País -->
-                    <div class="form-group mb-3">
+                    <div class="form-group col-12 col-md-6">
                         <label asp-for="CountryName" class="form-label fw-bold"></label>
-                        <input asp-for="CountryName" class="form-control" placeholder="Ingresa el nombre del país" />
+                        <input asp-for="CountryName" class="form-control" id="CountryName" placeholder="Ingresa el nombre del país" />
                         <span asp-validation-for="CountryName" class="text-danger"></span>
+                        <div class="invalid-feedback">
+                            @Html.ValidationMessageFor(m => m.CountryName)
+                        </div>
                     </div>
 
                     <!-- Código Personalizado -->
@@ -53,25 +59,27 @@
                     </div>
 
                     <!-- País por Defecto (Switch) -->
-                    <div class="form-group mb-3">
-                        <label asp-for="IsDefault" class="form-label fw-bold" for="IsDefaultSwitch"></label>
-                        <div class="d-flex align-items-center ps-md-4 border-start ms-1">
-                            <i class="bi bi-star text-primary me-3 fs-5"></i>
-                            <div class="form-check form-switch mb-0 ms-3">
-                                <input asp-for="IsDefault" class="form-check-input" type="checkbox" role="switch" id="IsDefaultSwitch" />
+                    <fieldset class="mb-3 border-top pt-3">
+                        <legend class="visually-hidden">Opciones</legend>
+                        <div class="form-check form-switch">
+                            <label asp-for="IsDefault" class="form-check-label" for="IsDefaultSwitch"></label>
+                            <div class="d-flex align-items-center ps-md-4 border-start ms-1">
+                                <i class="bi bi-star text-primary me-3 fs-5"></i>
+                                <div class="form-check form-switch mb-0 ms-3">
+                                    <input asp-for="IsDefault" class="form-check-input" type="checkbox" role="switch" id="IsDefaultSwitch" />
+                                </div>
+                                <small class="text-muted ms-1 fw-bold">¿Definir como país por defecto?</small>
                             </div>
-                            <small class="text-muted ms-1 fw-bold">¿Definir como país por defecto?</small>
+                            <span asp-validation-for="IsDefault" class="text-danger"></span>
                         </div>
-                        <span asp-validation-for="IsDefault" class="text-danger"></span>
-                    </div>
+                    </fieldset>
 
                     <!-- ============================ Botones de Acción ============================ -->
-                    <div class="form-group">
+                    <div class="card-footer bg-light text-end">
                         <hr />
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-floppy"></i> Aplicar</button>
-                        <a class="btn btn-secondary" asp-action="Index"><i class="bi bi-x-square"></i> Cancelar</a>
+                        <button type="submit" class="btn btn-primary me-2"><i class="bi bi-floppy me-1"></i> Aplicar</button>
+                        <a asp-action="Index" class="btn btn-secondary text-white"><i class="bi bi-x-square me-1"></i> Cancelar</a>
                     </div>
-
                 </div>
             </form>
         </div>

@@ -56,7 +56,7 @@ namespace queue_management.Controllers
         }
 
         // GET: Countries/Details
-        [HttpGet("Countries/Details/{id:int}")]
+        [HttpGet("Details/{id:int}")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || id <= 0)
@@ -87,7 +87,7 @@ namespace queue_management.Controllers
 
         #region Create Actions
         // GET: Countries/Create
-        [HttpGet("Countries/Create/{id:int}")]
+        [HttpGet("Create")]
         //[Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
@@ -100,7 +100,7 @@ namespace queue_management.Controllers
         }
 
         // POST: Countries/Create
-        [HttpPost("Countries/Create")]
+        [HttpPost("Create")]
         [ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("CountryId,CountryName,CustomCode,VisibilityStatus,IsDefault")] Country country)
@@ -139,7 +139,7 @@ namespace queue_management.Controllers
 
         // GET: Countries/Edit
         //[Authorize(Roles = "Admin")]
-        [HttpGet("Countries/Edit/{id:int}")]
+        [HttpGet("Edit/{id:int}")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || id <= 0)
@@ -167,7 +167,7 @@ namespace queue_management.Controllers
 
         #region Edit Actions
         // POST: Countries/Edit
-        [HttpPost("Countries/Edit/{id:int}")]
+        [HttpPost("Edit/{id:int}")]
         [ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, [Bind("CountryId,CountryName,CustomCode,VisibilityStatus,IsDefault,RowVersion")] Country country)
@@ -215,7 +215,7 @@ namespace queue_management.Controllers
         #region Delete Actions
         // GET: Countries/Delete
         [ActionName("Delete")]
-        [HttpGet("Countries/Delete/{id:int}")]
+        [HttpGet("Delete/{id:int}")]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -244,7 +244,7 @@ namespace queue_management.Controllers
         }
 
         // POST: Countries/Delete/5
-        [HttpPost("Countries/Delete/{id:int}")]
+        [HttpPost("Delete/{id:int}")]
         [ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
@@ -294,7 +294,10 @@ namespace queue_management.Controllers
                 }).ToList();
         }
 
+        // GET  /Countries/VerifyCustomCode
+        // POST /Countries/VerifyCustomCode
         [AcceptVerbs("GET", "POST")]
+        [Route("VerifyCustomCode")]
         public async Task<IActionResult> VerifyCustomCode(string customCode, int countryId)
         {
             if (string.IsNullOrWhiteSpace(customCode))
@@ -307,13 +310,15 @@ namespace queue_management.Controllers
 
             return Json(!exists); // true si NO existe → válido
         }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+
+        [HttpGet("Error")]
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
+       
         #endregion
     }
 }
