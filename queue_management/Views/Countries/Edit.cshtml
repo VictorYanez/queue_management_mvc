@@ -6,48 +6,54 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!-- ============================ Encabezado Principal ============================ -->
-<div class="text-center">
-    <h1 class="display-6">@ViewData["Title"]</h1>
+<!-- Título -->
+<div class="row justify-content-center mb-4">
+    <div class="col-12 col-md-8 text-center">
+        <h1 class="display-6">@ViewData["Title"]</h1>
+    </div>
 </div>
-<hr />
 <!-- ============================ Definición de Card / Encabezado / Responsive ============================ -->
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-12 col-md-8">
         <div class="card shadow border-1">
             <!-- ============================ Encabezado Card ============================ -->
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
+            <div class="card-header bg-primary text-white border-bottom">
+                <h5 class="mb-0 fs-7">
                     <i class="bi bi-globe-americas"></i>
-                    País a Editar Id.: @Model.CountryId - @Model.CountryName
+                    País a Editar No. Id.: @Model.CountryId - @Model.CountryName
                 </h5>
             </div>
             <!-- Formulario de País -->
             <!-- ============================ Cuerpo Card ============================ -->
             <form asp-action="Edit" asp-controller="Countries" method="post" class="needs-validation" novalidate>
                 <div class="card-body">
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-                        <!-- Llaves ocultas para editar -->
-                        <input type="hidden" asp-for="CountryId" />
-                        <input type="hidden" asp-for="RowVersion" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" id="summaryError"></div>
+                    <!-- Llaves ocultas para editar -->
+                    <input type="hidden" asp-for="CountryId" />
+                    <input type="hidden" asp-for="RowVersion" />
 
                     <!-- Nombre del País -->
-                    <div class="form-group mb-3">
+                    <div class="form-group col-12 col-md-6 mb-3">
                         <label asp-for="CountryName" class="form-label fw-bold"></label>
-                        <input asp-for="CountryName" class="form-control" placeholder="Ingresa el nombre del país" />
+                        <input asp-for="CountryName" class="form-control" id="CountryName" placeholder="Ingresa el nombre del país" />
                         <span asp-validation-for="CountryName" class="text-danger"></span>
+                        <div class="invalid-feedback">
+                            @Html.ValidationMessageFor(m => m.CountryName)
+                        </div>
                     </div>
 
                     <!-- Código Personalizado -->
-                    <div class="form-group mb-3">
+                    <div class="form-group col-12 col-md-6 mb-3">
                         <label asp-for="CustomCode" class="form-label fw-bold"></label>
                         <input asp-for="CustomCode" class="form-control" placeholder="Código opcional (máx. 14 caracteres)" maxlength="14" />
                         <span asp-validation-for="CustomCode" class="text-danger"></span>
+                        <small class="text-muted">Este código debe ser único si se especifica</small>
                     </div>
 
                     <!-- Estado de Visibilidad -->
-                    <div class="form-group mb-3">
+                    <div class="form-group col-12 col-md-6 mb-3">
                         <label asp-for="VisibilityStatus" class="form-label fw-bold"></label>
-                        <select asp-for="VisibilityStatus" asp-items="@(ViewData["VisibilityStatusOptions"] as List<SelectListItem>)" class="form-select" required>
+                        <select asp-for="VisibilityStatus" asp-items=@(ViewData["VisibilityStatusOptions"] as List<SelectListItem>) class="form-select" required>
                             <option value="">-- Seleccione un estado --</option>
                         </select>
                         <span asp-validation-for="VisibilityStatus" class="text-danger"></span>
@@ -57,18 +63,20 @@
                     </div>
 
                     <!-- País por Defecto (Switch) -->
-                    <div class="form-group mb-3">
-                        <label asp-for="IsDefault" class="form-label fw-bold" for="IsDefaultSwitch"></label>
-                        <div class="d-flex align-items-center ps-md-4 border-start ms-1">
-                            <i class="bi bi-star text-primary me-3 fs-5"></i>
-                            <div class="form-check form-switch mb-0 ms-3">
-                                <input asp-for="IsDefault" class="form-check-input" type="checkbox" role="switch" id="IsDefaultSwitch" />
+                    <fieldset class="mb-3 border-top pt-3">
+                        <legend class="visually-hidden">Opciones</legend>
+                        <div class="form-check form-switch col-12 col-md-6 mb-3">
+                            <label asp-for="IsDefault" class="form-check-label fw-bold d-block" for="IsDefaultSwitch"></label>
+                            <div class="d-flex align-items-center ps-md-4 border-start ms-1">
+                                <i class="bi bi-star text-primary me-3 fs-5"></i>
+                                <div class="form-check form-switch mb-0 ms-3">
+                                    <input asp-for="IsDefault" class="form-check-input" type="checkbox" role="switch" id="IsDefaultSwitch" />
+                                </div>
+                                <small class="text-muted ms-1 fw-bold">¿Definir como país por defecto?</small>
                             </div>
-                            <small class="text-muted ms-1 fw-bold">¿Definir como país por defecto?</small>
+                            <span asp-validation-for="IsDefault" class="text-danger"></span>
                         </div>
-                        <span asp-validation-for="IsDefault" class="text-danger"></span>
-                    </div>
-
+                    </fieldset>
                     <!-- ============================ Botones de Acción ============================ -->
                     <div class="form-group">
                         <hr />

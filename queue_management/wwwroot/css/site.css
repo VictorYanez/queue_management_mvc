@@ -1,22 +1,58 @@
+/* =============================================
+   CONFIGURACIONES CSS BASICOS DEL SITIO
+   ============================================= */
+
+/* 
+ * Tamaño de fuente base responsivo 
+ * Mobile-first: 14px en móviles, 16px en pantallas >= 768px 
+ */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* 
+ * Estilos de enfoque (focus) para elementos interactivos 
+ * - Crea un doble borde azul (#258cfb) con sombra para mejor accesibilidad
+ * - Aplica a: botones, enlaces-nav, controles de formulario y checkboxes
+ */
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+/* 
+ * Configuración estructural del documento 
+ * - Asegura que el html ocupe al menos el 100% del viewport
+ * - Margen inferior del body para el footer (60px)
+ */
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+/* =============================================
+   SOLUCIONES PARA CONFLICTOS ESPECÍFICOS
+   ============================================= */
+
+/*
+ * Corrección para texto en botones secundarios
+ * - Problema: AdminLTE sobrescribe el color de texto de Bootstrap
+ * - Solución: Fuerza color blanco con !important 
+ * - Nota: El !important se justifica por conflicto entre frameworks
+ */
+.btn-secondary {
+    color: white !important; /* Corrección para conflicto AdminLTE/Bootstrap */
 }

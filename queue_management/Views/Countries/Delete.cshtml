@@ -5,44 +5,51 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <!-- ============================ Encabezado Principal ============================ -->
-<div class="text-center">
-    <h1 class="display-6">@ViewData["Title"]</h1>
+<!-- Título Principal Centrado -->
+<div class="row justify-content-center mb-4">
+    <div class="col-12 col-md-8 text-center">
+        <h1 class="display-6">@ViewData["Title"]</h1>
+    </div>
 </div>
 <hr />
-<!-- ============================ Card Responsive Detalle País ============================ -->
+<!-- ============================ Definición de Card / Encabezado / Responsive ============================ -->
 <div class="row justify-content-center">
-    <div class="col-md-6">
+    <div class="col-12 col-md-8">
         <div class="card shadow border-1">
             <!-- ============================ Encabezado Card ============================ -->
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
+            <div class="card-header bg-primary text-white border-bottom">
+                <h5 class="mb-0 fs-5">
                     <i class="bi bi-globe-americas"></i>
-                    Borrar País Id.: @Model.CountryId - @Model.CountryName
-                    ¿Estás seguro de que deseas borrar este País?
+                    País a borrar No. Id.: @Model.CountryId - @Model.CountryName
                 </h5>
             </div>
             <!-- ============================ Cuerpo Card ============================ -->
             <form asp-action="Delete" asp-controller="Countries" method="post" class="needs-validation" novalidate>
                 <div class="card-body">
                     <!-- ========== País: ID y RowVersion ocultos ========== -->
-                    <!--  <input type="hidden" asp-for="RowVersion" value="@Model.RowVersion" class="RowVersion"/> -->
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" id="summaryError"></div>
+                    <!-- Llaves ocultas para editar -->
                     <input type="hidden" asp-for="CountryId" />
 
                     <!-- ========== Nombre del País ========== -->
-                    <div class="form-group mb-3">
+                    <div class="form-group col-12 col-md-6 mb-3">
                         <label asp-for="CountryName" class="form-label fw-bold"></label>
-                        <input asp-for="CountryName" class="form-control" readonly />
+                        <input asp-for="CountryName" class="form-control" id="CountryName" readonly />
+                        <span asp-validation-for="CountryName" class="text-danger"></span>
+                        <div class="invalid-feedback">
+                            @Html.ValidationMessageFor(m => m.CountryName)
+                        </div>
                     </div>
 
                     <!-- ========== Código Personalizado ========== -->
-                    <div class="form-group mb-3">
+                    <div class="form-group col-12 col-md-6 mb-3">
                         <label asp-for="CustomCode" class="form-label fw-bold"></label>
                         <input asp-for="CustomCode" class="form-control" maxlength="14" readonly />
+                        <span asp-validation-for="CustomCode" class="text-danger"></span>
                     </div>
 
                     <!-- ========== Estado de Visibilidad ========== -->
-                    <div class="form-group mb-3">
+                    <div class="form-group col-12 col-md-6 mb-3">
                         <label asp-for="VisibilityStatus" class="form-label fw-bold"></label>
                         <select asp-for="VisibilityStatus" asp-items="@(ViewData["VisibilityStatusOptions"] as List<SelectListItem>)" class="form-select" disabled>
                             <option value="">-- Seleccione un estado --</option>
@@ -50,7 +57,7 @@
                     </div>
 
                     <!-- ========== País por Defecto (Switch) ========== -->
-                    <div class="form-group mb-3">
+                    <div class="form-group col-12 col-md-6 mb-3">
                         <label asp-for="IsDefault" class="form-label fw-bold" for="IsDefaultSwitch"></label>
                         <div class="d-flex align-items-center ps-md-4 border-start ms-1">
                             <i class="bi bi-star text-primary me-3 fs-5"></i>
@@ -60,10 +67,11 @@
                             <small class="text-muted ms-1 fw-bold">¿Definir como país por defecto?</small>
                         </div>
                     </div>
-
                     <!-- ============================ Botones ============================ -->
-                    <div class="form-group">
-                        <hr />
+                    <div class="card-footer">
+                        <p class="text-danger fw-bold">
+                            ¿Estás seguro de que deseas <span class="text-uppercase">borrar</span> este país?
+                        </p>
                         <button type="submit" class="btn btn-danger">
                             <i class="bi bi-trash"></i> Borrar
                         </button>

@@ -16,7 +16,7 @@
 <!-- ============================ Definición de Card / Encabezado / Responsive ============================ -->
 <div class="row justify-content-center">
     <div class="col-12 col-md-8">
-        <div class="card border-0 shadow-sm">
+        <div class="card shadow border-1 ">
             <!-- ============================ Encabezado Card ============================ -->
             <div class="card-header bg-primary text-white border-bottom">
                 <h5 class="mb-0 fs-7"><i class="bi bi-globe-americas"></i>  Crear Nuevo País</h5>
@@ -29,7 +29,7 @@
                     <!-- Llaves ocultas para editar -->
 
                     <!-- Nombre del País -->
-                    <div class="form-group col-12 col-md-6">
+                    <div class="form-group col-12 col-md-6 mb-3">
                         <label asp-for="CountryName" class="form-label fw-bold"></label>
                         <input asp-for="CountryName" class="form-control" id="CountryName" placeholder="Ingresa el nombre del país" />
                         <span asp-validation-for="CountryName" class="text-danger"></span>
@@ -39,7 +39,7 @@
                     </div>
 
                     <!-- Código Personalizado -->
-                    <div class="form-group mb-3">
+                    <div class="form-group col-12 col-md-6 mb-3">
                         <label asp-for="CustomCode" class="form-label fw-bold"></label>
                         <input asp-for="CustomCode" class="form-control" placeholder="Código opcional (máx. 14 caracteres)" maxlength="14" />
                         <span asp-validation-for="CustomCode" class="text-danger"></span>
@@ -47,7 +47,7 @@
                     </div>
 
                     <!-- Estado de Visibilidad -->
-                    <div class="form-group mb-3">
+                    <div class="form-group col-12 col-md-6 mb-3">
                         <label asp-for="VisibilityStatus" class="form-label fw-bold"></label>
                         <select asp-for="VisibilityStatus" asp-items=@(ViewData["VisibilityStatusOptions"] as List<SelectListItem>) class="form-select" required>
                             <option value="">-- Seleccione un estado --</option>
@@ -61,8 +61,8 @@
                     <!-- País por Defecto (Switch) -->
                     <fieldset class="mb-3 border-top pt-3">
                         <legend class="visually-hidden">Opciones</legend>
-                        <div class="form-check form-switch">
-                            <label asp-for="IsDefault" class="form-check-label" for="IsDefaultSwitch"></label>
+                        <div class="form-check form-switch col-12 col-md-6 mb-3">
+                            <label asp-for="IsDefault" class="form-check-label fw-bold d-block" for="IsDefaultSwitch"></label>
                             <div class="d-flex align-items-center ps-md-4 border-start ms-1">
                                 <i class="bi bi-star text-primary me-3 fs-5"></i>
                                 <div class="form-check form-switch mb-0 ms-3">
@@ -75,8 +75,7 @@
                     </fieldset>
 
                     <!-- ============================ Botones de Acción ============================ -->
-                    <div class="card-footer bg-light text-end">
-                        <hr />
+                    <div class="card-footer">
                         <button type="submit" class="btn btn-primary me-2"><i class="bi bi-floppy me-1"></i> Aplicar</button>
                         <a asp-action="Index" class="btn btn-secondary text-white"><i class="bi bi-x-square me-1"></i> Cancelar</a>
                     </div>
