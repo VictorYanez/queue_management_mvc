@@ -3,44 +3,94 @@
 
 @{
     ViewData["Title"] = "Crear Departamento";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-<h1>Crear Departamento</h1>
-<hr />
-<h4>Crear un nuevo Departamento asociado a un país</h4>
-<hr />
-
-    <div class="col-md-4">
-
-        <form asp-action="Create" asp-controller="Departments" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-            <!-- Campo oculto para DepartmentId -->
-        <!--  <input type="hidden" asp-for="DepartmentId" /> -->
+<!-- ============================ Encabezado Principal ============================ -->
+<!-- Título -->
+<div class="row justify-content-center mb-4">
+    <div class="col-12 col-md-8 text-center">
+        <h1 class="display-6">@ViewData["Title"]</h1>
+        <p class="text-muted">Complete los datos requeridos para registrar un nuevo departamento, asociado a un país.</p>
+    </div>
+</div>
+<!-- ============================ Definición de Card / Encabezado / Responsive ============================ -->
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8">
+        <div class="card shadow border-1 ">
+            <!-- ============================ Encabezado Card ============================ -->
+            <div class="card-header bg-primary text-white border-bottom">
+                <h5 class="mb-0 fs-7"><i class="bi bi-globe-americas"></i>  Crear Nuevo Departamento</h5>
+            </div>
+            <!-- Formulario de País -->
+            <!-- ============================ Cuerpo Card ============================ -->
+            <form asp-action="Create" asp-controller="Departments" method="post" class="needs-validation" novalidate>
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger d-none" id="summaryError"></div>
+                    <!-- Llaves ocultas para creación -->
+                    <!-- Llaves ocultas no se usa en este formulario -->
            
             <!--- Para Lista de Pais   -->
-            <div class="mb-3 form-group">
-                <label asp-for="CountryId" class="form-label">País </label>
-                <select class="form-select form-select sm" asp-for="CountryId" asp-items="ViewBag.CountryId">
-                    <option value=""> --- Seleccionar País --- </option>
-                </select>
-                <span asp-validation-for="CountryId" class="text-danger"></span>             
-            </div>
-            <!---  Para los campos propios de Departamento  -->
-            <div class="form-group mb-3">
-                <label asp-for="DepartmentName" class="control-label" type="text"></label>
-                <input asp-for="DepartmentName" class="form-control" placeholder="Ingresa la descripción del Departamento" type="text" />
-                <span asp-validation-for="DepartmentName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+                    <div class="form-group col-12 col-md-6 mb-3">
+                        <label asp-for="CountryId" class="form-label fw-bold"></label>
+                        <select asp-for="CountryId" asp-items="ViewBag.CountryId" class="form-select" required>
+                            <option value="">-- Seleccione un país --</option>
+                        </select>
+                        <span asp-validation-for="CountryId" class="text-danger"></span>
+                    </div>
+
+                    <!-- Nombre del Departamento -->
+                    <div class="form-group col-12 col-md-6 mb-3">
+                        <label asp-for="DepartmentName" class="form-label fw-bold"></label>
+                        <input asp-for="DepartmentName" class="form-control" placeholder="Nombre del Departamento" />
+                        <span asp-validation-for="DepartmentName" class="text-danger"></span>
+                    </div>
+
+                    <!-- Código personalizado -->
+                    <div class="form-group col-12 col-md-6 mb-3">
+                        <label asp-for="CustomCode" class="form-label fw-bold"></label>
+                        <input asp-for="CustomCode" class="form-control" maxlength="14" placeholder="Código interno (opcional)" />
+                        <span asp-validation-for="CustomCode" class="text-danger"></span>
+                        <small class="text-muted">Este campo puede usarse como identificador alternativo</small>
+                    </div>
+
+                    <!-- Estado de visibilidad -->
+                    <div class="form-group col-12 col-md-6 mb-3">
+                        <label asp-for="VisibilityStatus" class="form-label fw-bold"></label>
+                        <select asp-for="VisibilityStatus" asp-items="ViewBag.VisibilityStatusOptions" class="form-select" required>
+                            <option value="">-- Seleccione un estado --</option>
+                        </select>
+                        <span asp-validation-for="VisibilityStatus" class="text-danger"></span>
+                        <div class="invalid-feedback">Seleccione un estado de visibilidad válido.</div>
+                    </div>
+
+                    <!-- Departamento por defecto -->
+                    <fieldset class="mb-3 border-top pt-3">
+                        <legend class="visually-hidden">Opciones</legend>
+                        <div class="form-check form-switch col-12 col-md-6">
+                            <label asp-for="IsDefault" class="form-check-label fw-bold" for="IsDefaultSwitch"></label>
+                            <div class="d-flex align-items-center ps-md-4 border-start ms-1">
+                                <i class="bi bi-star text-warning me-3 fs-5"></i>
+                                <div class="form-check form-switch mb-0 ms-3">
+                                    <input asp-for="IsDefault" class="form-check-input" type="checkbox" role="switch" id="IsDefaultSwitch" />
+                                </div>
+                                <small class="text-muted ms-2">¿Definir como departamento por defecto?</small>
+                            </div>
+                        </div>
+                        <span asp-validation-for="IsDefault" class="text-danger"></span>
+                    </fieldset>
+                </div>
+
                 <!---------------  Botones summit y cancelar  ------------->
-                <hr />
-                <button type="submit" class="btn btn-primary"><i class="bi bi-floppy"></i> Aplicar</button>
-                <a class="btn btn-secondary" asp-action="Index"><i class="bi bi-x-square"></i> Cancelar</a>
-            </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-floppy"></i> Aplicar</button>
+                    <a class="btn btn-secondary" asp-action="Index"><i class="bi bi-x-square"></i> Cancelar</a>
+                </div>
+
 
         </form>
+        </div>
     </div>
+</div>   
 
 @section Scripts {
     @{

@@ -4,12 +4,18 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var total = Model.Count();
 }
-
-<h1 class="text-center">
-    <i class="bi bi-globe-americas"></i>
-    Listado de Países</h1>
-
+<!-- ============================ Encabezado Principal ============================ -->
+<!-- Título -->
+<div class="row justify-content-center mb-4">
+    <div class="col-12 col-md-8 text-center">
+        <h1 class="display-6">
+            <i class="bi bi-globe-americas"></i>  Listado de Países
+        </h1>
+    </div>
+</div>
+<!-- ============================ Botón de Creación nuevo Elemento ============================ -->
 <div class="row">
     <div class="offset-9 col-3 mb-3">
         <div class="float-right">
@@ -19,7 +25,7 @@
         </div>
     </div>
 </div>
-
+<!-- ============================ Definición de Tabla con detalle de registros ============================ -->
 <div class="row">
     <div class="col-12">
         <div class="card border">
@@ -65,26 +71,26 @@
                                     </td>
 
                                     <td>
-                                            @if (item.IsDefault)
-                                            {
+                                        @if (item.IsDefault)
+                                        {
                                             <i class="bi bi-house-fill text-success"></i>
-                                            }
-                                            else
-                                            {
+                                        }
+                                        else
+                                        {
                                             <i class="bi bi-house-fill text-muted"></i>
-                                            }
-                                            @(item.IsDefault ? "Sí" : "No")
+                                        }
+                                        @(item.IsDefault ? "Sí" : "No")
                                     </td>
-                                    <td>
-                                    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.CountryId">
-                                        <i class="bi bi-pencil"></i> Editar
-                                    </a>
-                                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.CountryId">
-                                        <i class="bi bi-info-square"></i> Detalle
-                                    </a>
-                                    <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.CountryId">
-                                        <i class="bi bi-trash"></i> Borrar
-                                    </a>
+                                    <td class="text-nowrap">
+                                        <a class="btn btn-md btn-warning" asp-action="Edit" asp-route-id="@item.CountryId">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                                <a class="btn btn-md btn-info" asp-action="Details" asp-route-id="@item.CountryId">
+                                            <i class="bi bi-info-square"></i> Detalle
+                                        </a>
+                                                <a class="btn btn-md btn-danger" asp-action="Delete" asp-route-id="@item.CountryId">
+                                            <i class="bi bi-trash"></i> Borrar
+                                        </a>
                                     </td>
                                 </tr>
                             }

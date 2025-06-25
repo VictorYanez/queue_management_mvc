@@ -1,195 +1,390 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using queue_management.Data;
+using queue_management.Enums;
 using queue_management.Models;
+using queue_management.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace queue_management.Controllers
 {
     public class DepartmentsController : Controller
     {
         private readonly ApplicationDBContext _context;
+        private readonly ILogger<DepartmentsController> _logger;
+        private readonly IGeographyService _geoService;
 
-        public DepartmentsController(ApplicationDBContext context)
+        public DepartmentsController(ApplicationDBContext context, ILogger<DepartmentsController> logger, IGeographyService geoService)
         {
             _context = context;
+            _logger = logger;
+            _geoService = geoService;
         }
 
+
+        #region CRUD Operations
         //Endpoint para la visualización del Listado 
-        [HttpGet]
+        [HttpGet("")]
         public async Task<IActionResult> Index()
         {
-            var applicationDBContext = _context.Departments.Include(d => d.Country);
-            return View(await applicationDBContext.ToListAsync());
+            try
+            {
+                var departments = await _context.Departments
+                    .Include(d => d.Country) // Carga relacionada de país
+                    .Where(d => d.VisibilityStatus == VisibilityStatus.Activo)
+                    .OrderBy(d => d.DepartmentName)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                return View(departments);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar departamentos");
+                return RedirectToAction(nameof(Error));
+            }
         }
 
         // GET: Departments/Details/5
         //Endpoint para la visualización de Detalles del registro  
-        [HttpGet]
+        [HttpGet("Details/{id:int}")]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return View("NotFound"); 
-            }
+            if (id == null || id <= 0)
+                return NotFound();
 
-            var department = await _context.Departments
-                .Include(d => d.Country)
-                .FirstOrDefaultAsync(m => m.DepartmentId == id);
-            if (department == null)
+            try
             {
-                return View("NotFound");
-            }
+                var department = await _context.Departments
+                    .Include(d => d.Country)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(d => d.DepartmentId == id);
 
-            return View(department);
+                if (department == null)
+                    return NotFound();
+
+                ViewData["StatusOptions"] = GetStatusOptions();
+                ViewData["CountryList"] = await GetCountriesSelectListAsync(department.CountryId);
+
+                return View(department);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al cargar departamento ID {id}");
+                return RedirectToAction(nameof(Error));
+            }
         }
+        #endregion
 
+        #region Create Operations
         // GET: Departments/Create
-        public IActionResult Create()
+        [HttpGet("Create")]
+        public async Task<IActionResult> Create()
         {
-            ViewBag.CountryId = new SelectList(_context.Countries, "CountryId", "CountryName");
-            return View();
+            try
+            {
+                ViewData["StatusOptions"] = GetStatusOptions();
+                ViewData["CountryList"] = await GetCountriesSelectListAsync();
+
+                return View(new Department
+                {
+                    VisibilityStatus = VisibilityStatus.Activo,
+                    IsDefault = false
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al cargar formulario de creación");
+                return RedirectToAction(nameof(Error));
+            }
         }
 
         //Endpoint para la creación del Listado 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         // POST: Departments/Create
-
-        public async Task<IActionResult> Create([Bind("DepartmentName,CountryId")] Department department)
+        [HttpPost("Create")]
+        [ValidateAntiForgeryToken]
+        //[Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> Create([Bind("DepartmentName,CustomCode,VisibilityStatus,IsDefault,CountryId")] Department department)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                foreach (var error in errors)
+                if (ModelState.IsValid)
                 {
-                    Console.WriteLine(error); // O usa un logger para guardar estos mensajes
+                    // Validar código único
+                    if (await CustomCodeExists(department.CustomCode))
+                    {
+                        ModelState.AddModelError("CustomCode", "El código ya está en uso");
+                        ViewData["StatusOptions"] = GetStatusOptions();
+                        ViewData["CountryList"] = await GetCountriesSelectListAsync(department.CountryId);
+                        return View(department);
+                    }
+
+                    // Manejar departamento por defecto
+                    if (department.IsDefault)
+                        await _geoService.SetDefaultDepartment(department.DepartmentId);
+
+                    // Auditoría
+                    department.CreatedAt = DateTime.UtcNow;
+                    //department.CreatedBy = int.Parse(User.FindFirst("UserId").Value);
+
+                    _context.Add(department);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Departamento creado exitosamente";
+                    return RedirectToAction(nameof(Index));
                 }
-            }
 
-            if (ModelState.IsValid)
+                ViewData["StatusOptions"] = GetStatusOptions();
+                ViewData["CountryList"] = await GetCountriesSelectListAsync(department.CountryId);
+                return View(department);
+            }
+            catch (Exception ex)
             {
-                _context.Add(department);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                _logger.LogError(ex, "Error al crear departamento");
+                ModelState.AddModelError("", "Error al crear departamento");
+                return RedirectToAction(nameof(Error));
             }
-
-            ViewBag.CountryId = new SelectList(_context.Countries, "CountryId", "CountryName", department.CountryId);
-
-            return View(department); 
         }
+        #endregion
 
-        // GET: Para visualizar la información del campo a Editar  
-        [HttpGet]
+        #region Edit Operations
+
+        // GET: Departments/Edit/5
+        [HttpGet("Edit/{id:int}")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
+            if (id == null || id <= 0)
                 return NotFound();
-            }
 
-            var xdepartment = await _context.Departments.FindAsync(id);
-            var department = await _context.Departments.AsNoTracking().FirstOrDefaultAsync(d => d.DepartmentId == id);
-
-            if (department == null)
+            try
             {
-                return NotFound();
-            }
+                var department = await _context.Departments.FindAsync(id);
+                if (department == null)
+                    return NotFound();
 
-            ViewBag.CountryId = new SelectList(_context.Countries, "CountryId", "CountryName", department.CountryId);
-            //ViewBag.CountryId = await _context.Countries.Select(m => new SelectListItem { Value = m.CountryId.ToString(), Text = m.CountryName }).ToListAsync();
-            return View(department);
+                ViewData["StatusOptions"] = GetStatusOptions();
+                ViewData["CountryList"] = await GetCountriesSelectListAsync(department.CountryId);
+
+                return View(department);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al cargar departamento ID {id} para edición");
+                return RedirectToAction(nameof(Error));
+            }
         }
 
-        // POST: Departments/Edit/
-        [HttpPost]
+        // POST: Departments/Edit/5
+        [HttpPost("Edit/{id:int}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("DepartmentId,DepartmentName,CountryId,RowVersion")] Department department)
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> Edit(int id, [Bind("DepartmentId,DepartmentName,CustomCode,VisibilityStatus,IsDefault,CountryId,RowVersion")] Department department)
         {
-
             if (id != department.DepartmentId)
-            {
-                return RedirectToAction(nameof(NotFound), "Home");
-            }
+                return NotFound();
 
-            if (ModelState.IsValid)
+            try
             {
-                try
+                if (ModelState.IsValid)
                 {
+                    // Validar código único
+                    if (await CustomCodeExists(department.CustomCode, department.DepartmentId))
+                    {
+                        ModelState.AddModelError("CustomCode", "El código ya está en uso");
+                        ViewData["StatusOptions"] = GetStatusOptions();
+                        ViewData["CountryList"] = await GetCountriesSelectListAsync(department.CountryId);
+                        return View(department);
+                    }
+
+                    // Manejar departamento por defecto
+                    if (department.IsDefault)
+                        await _geoService.SetDefaultDepartment(department.DepartmentId);
+
+                    // Auditoría
+                    department.ModifiedAt = DateTime.UtcNow;
+                    department.ModifiedBy = int.Parse(User.FindFirst("UserId").Value);
+
                     _context.Update(department);
                     await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Departamento actualizado exitosamente";
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!DepartmentExists(department.DepartmentId))
-                    {
-                        return RedirectToAction(nameof(NotFound), "Home");
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+
+                ViewData["StatusOptions"] = GetStatusOptions();
+                ViewData["CountryList"] = await GetCountriesSelectListAsync(department.CountryId);
+                return View(department);
             }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                if (!DepartmentExists(id))
+                    return NotFound();
 
-            ViewBag.Countries = new SelectList(await _context.Countries.ToListAsync(), "CountryId", "CountryName", department.CountryId);
-            ViewBag.Departments = new SelectList(await _context.Departments.Where(d => d.CountryId == department.CountryId).ToListAsync(), "DepartmentId", "DepartmentName", department.DepartmentId);
-
-            return View(department);
+                _logger.LogError(ex, $"Error de concurrencia al editar departamento ID {id}");
+                ModelState.AddModelError("", "El registro fue modificado por otro usuario. Por favor refresque y vuelva a intentar.");
+                return View(department);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al editar departamento ID {id}");
+                return RedirectToAction(nameof(Error));
+            }
         }
 
+        #endregion
 
+        #region Delete Operations
 
         // GET: Departments/Delete/5
+        [HttpGet("Delete/{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
+            if (id == null || id <= 0)
                 return NotFound();
+
+            try
+            {
+                var department = await _context.Departments
+                    .Include(d => d.Country)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(d => d.DepartmentId == id);
+
+                if (department == null)
+                    return NotFound();
+
+                // Verificar dependencias
+                if (await HasDependencies(id.Value))
+                {
+                    ViewBag.ErrorMessage = "No se puede eliminar porque tiene municipios o unidades asociadas";
+                    return View(department);
+                }
+
+                return View(department);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al cargar departamento ID {id} para eliminación");
+                return RedirectToAction(nameof(Error));
             }
 
-            var department = await _context.Departments
-                .Include(d => d.Country)
-                .FirstOrDefaultAsync(m => m.DepartmentId == id);
-            if (department == null)
-            {
-                return NotFound();
-            }
-
-            return View(department);
         }
 
-        // POST: Departments/Delete/
-        [HttpPost, ActionName("Delete")]
+
+
+        // POST: Departments/Delete/5
+        [HttpPost("Delete/{id:int}")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var department = await _context.Departments.FindAsync(id);
-            if (department != null)
+            try
             {
-                _context.Departments.Remove(department);
-            }
+                var department = await _context.Departments.FindAsync(id);
+                if (department == null)
+                {
+                    return NotFound();
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                // Verifica solo dependencias geográficas (municipios)
+                if (await HasDependencies(id))
+                {
+                    TempData["ErrorMessage"] = "No se puede eliminar el departamento porque tiene municipios asociados.";
+                    return RedirectToAction(nameof(Delete), new { id });
+                }
+
+                _context.Departments.Remove(department);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Departamento eliminado exitosamente";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al eliminar departamento ID {id}");
+                return RedirectToAction(nameof(Error));
+            }
         }
+        #endregion
 
 
         // POST: Funciones Adicionales 
+        #region Helper Methods
         private bool DepartmentExists(int id)
         {
             return _context.Departments.Any(e => e.DepartmentId == id);
         }
-
-        public async Task<JsonResult> GetDepartments(int countryId)
+        private async Task<bool> HasDependencies(int departmentId)
         {
-            var departments = await _context.Departments.Where(d => d.CountryId == countryId).ToListAsync();
-            return Json(new SelectList(departments, "DepartmentId", "DepartmentName"));
+            /// Verifica si existen dependencias geográficas asociadas al departamento
+            /// (Municipios que pertenecen a este departamento)
+            return await _context.Municipalities
+                .AsNoTracking()
+                .AnyAsync(m => m.DepartmentId == departmentId);
         }
+        private async Task<bool> CustomCodeExists(string customCode, int? excludeId = null)
+        {
+            if (string.IsNullOrWhiteSpace(customCode))
+                return false;
+
+            var query = _context.Departments.Where(d => d.CustomCode == customCode);
+
+            if (excludeId.HasValue)
+                query = query.Where(d => d.DepartmentId != excludeId.Value);
+
+            return await query.AnyAsync();
+        }
+        private List<SelectListItem> GetStatusOptions()
+        {
+            return Enum.GetValues(typeof(VisibilityStatus))
+                .Cast<VisibilityStatus>()
+                .Select(v => new SelectListItem
+                {
+                    Text = v.ToString(),
+                    Value = ((int)v).ToString()
+                }).ToList();
+        }
+        private async Task<List<SelectListItem>> GetCountriesSelectListAsync(int? selectedId = null)
+        {
+            var countries = await _context.Countries
+                .Where(c => c.VisibilityStatus == VisibilityStatus.Activo)
+                .OrderBy(c => c.CountryName)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return countries.Select(c => new SelectListItem
+            {
+                Value = c.CountryId.ToString(),
+                Text = c.CountryName,
+                Selected = selectedId.HasValue && c.CountryId == selectedId.Value
+            }).ToList();
+        }
+
+        [AcceptVerbs("GET", "POST")]
+        [Route("VerifyCustomCode")]
+        public async Task<IActionResult> VerifyCustomCode(string customCode, int? departmentId)
+        {
+            if (string.IsNullOrWhiteSpace(customCode))
+                return Json(true); // Válido si está vacío
+
+            var exists = await CustomCodeExists(customCode, departmentId);
+            return Json(!exists);
+        }
+
+        [HttpGet("Error")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+        #endregion
     }
 }
